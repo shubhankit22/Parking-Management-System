@@ -1,0 +1,429 @@
+{
+  "info": {
+    "name": "Parking Management System API",
+    "description": "Complete API collection for testing the Parking Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "tokenName",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "authorization_code",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{client_id}}",
+        "type": "string"
+      },
+      {
+        "key": "clientSecret",
+        "value": "{{client_secret}}",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "http://localhost:8080/oauth2/authorization/google",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "http://localhost:8080/login/oauth2/code/google",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "YOUR_GOOGLE_CLIENT_ID",
+      "type": "string"
+    },
+    {
+      "key": "client_secret",
+      "value": "YOUR_GOOGLE_CLIENT_SECRET",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "Application Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "info"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parking Operations",
+      "item": [
+        {
+          "name": "Get Entry Gates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/entry-gates",
+              "host": ["{{base_url}}"],
+              "path": ["api", "entry-gates"]
+            }
+          }
+        },
+        {
+          "name": "Park Vehicle - Car",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plateNo\": \"ABC-123\",\n  \"vehicleType\": \"CAR\",\n  \"ownerId\": \"user123\",\n  \"entryGateId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/entry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "entry"]
+            }
+          }
+        },
+        {
+          "name": "Park Vehicle - Bike",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plateNo\": \"XYZ-789\",\n  \"vehicleType\": \"BIKE\",\n  \"ownerId\": \"user456\",\n  \"entryGateId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/entry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "entry"]
+            }
+          }
+        },
+        {
+          "name": "Exit with Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 4.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/exit/{{ticket_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "exit", "{{ticket_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Retry Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 4.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/exit/{{ticket_id}}/retry",
+              "host": ["{{base_url}}"],
+              "path": ["api", "exit", "{{ticket_id}}", "retry"]
+            }
+          }
+        },
+        {
+          "name": "Get Parking Lot Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/parking-lot/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "parking-lot", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Operations",
+      "item": [
+        {
+          "name": "Get Pricing Rules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pricing-rules"]
+            }
+          }
+        },
+        {
+          "name": "Update Pricing Rules",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleType\": \"CAR\",\n  \"hourlyRate\": 3.0,\n  \"description\": \"Updated car rate for peak hours\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/pricing-rules",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pricing-rules"]
+            }
+          }
+        },
+        {
+          "name": "Add Parking Slot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parkingLotId\": 1,\n  \"floor\": 1,\n  \"slotType\": \"CAR\",\n  \"slotNumber\": \"A-101\",\n  \"xCoordinate\": 10.0,\n  \"yCoordinate\": 10.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/slots",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "slots"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Add Slots",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"parkingLotId\": 1,\n    \"floor\": 1,\n    \"slotType\": \"CAR\",\n    \"slotNumber\": \"A-102\",\n    \"xCoordinate\": 20.0,\n    \"yCoordinate\": 20.0\n  },\n  {\n    \"parkingLotId\": 1,\n    \"floor\": 1,\n    \"slotType\": \"BIKE\",\n    \"slotNumber\": \"B-101\",\n    \"xCoordinate\": 5.0,\n    \"yCoordinate\": 5.0\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/slots/bulk",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "slots", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Get Slot Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/slots/statistics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "slots", "statistics"]
+            }
+          }
+        },
+        {
+          "name": "Get Parking Lot Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/parking-lots/1/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "parking-lots", "1", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Update Parking Slot",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slotNumber\": \"A-101-UPDATED\",\n  \"xCoordinate\": 15.0,\n  \"yCoordinate\": 15.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/slots/{{slot_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "slots", "{{slot_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Remove Parking Slot",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/slots/{{slot_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "slots", "{{slot_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
