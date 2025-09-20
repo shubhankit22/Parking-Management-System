@@ -219,7 +219,7 @@ public class AdminService {
             overview.put("isActive", parkingLot.isActive());
             
             // Get slot statistics
-            Map<String, Long> slotStats = new HashMap<>();
+            Map<String, Object> slotStats = new HashMap<>();
             for (VehicleType type : VehicleType.values()) {
                 long totalSlots = parkingSlotRepository.countByParkingLotAndSlotType(parkingLot, type);
                 long availableSlots = parkingSlotRepository.countAvailableSlotsByTypeAndParkingLot(parkingLot, type);

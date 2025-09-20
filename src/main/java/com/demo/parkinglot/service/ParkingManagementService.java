@@ -7,6 +7,7 @@ import com.demo.parkinglot.util.ParkingUtility;
 import com.demo.parkinglot.enums.VehicleType;
 import com.demo.parkinglot.config.ParkingChargesConfig;
 import com.demo.parkinglot.constants.ParkingConstants;
+import com.demo.parkinglot.exception.SlotAllocationException;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class ParkingManagementService {
                 .orElseGet(() -> vehicleRepository.save(new Vehicle(plateNo, vehicleType, ownerId)));
 
         if (ticketRepository.findByVehicleAndActiveTrue(vehicle).isPresent()) {
-            throw new IllegalStateException(ParkingConstants.VEHICLE_ALREADY_PARKED);
+            throw new SlotAllocationException("Vehicle with plate number " + plateNo + " is already parked");
         }
 
         // Validate entry gate
@@ -79,7 +80,7 @@ public class ParkingManagementService {
 
         // Check if parking lot is full
         if (isParkingLotFull(parkingLot, vehicleType)) {
-            throw new IllegalStateException("Parking lot is full for vehicle type: " + vehicleType.getDisplayName());
+            throw new SlotAllocationException("Parking lot is full for vehicle type: " + vehicleType.getDisplayName());
         }
 
         // Find and allocate slot with concurrency safety
@@ -103,7 +104,7 @@ public class ParkingManagementService {
                 List<ParkingSlot> availableSlots = slotRepository.findAvailableSlotsByTypeAndParkingLot(vehicleType, parkingLot);
                 
                 if (availableSlots.isEmpty()) {
-                    throw new IllegalStateException(ParkingConstants.NO_AVAILABLE_SLOT + vehicleType.getDisplayName());
+                    throw new SlotAllocationException("No available slots for vehicle type: " + vehicleType.getDisplayName());
                 }
                 
                 // Find the nearest slot to the entry gate
@@ -120,7 +121,7 @@ public class ParkingManagementService {
                     // Slot was already allocated by another transaction
                     retryCount++;
                     if (retryCount >= maxRetries) {
-                        throw new IllegalStateException("Unable to allocate slot after " + maxRetries + " attempts");
+                        throw new SlotAllocationException("Unable to allocate slot after " + maxRetries + " attempts");
                     }
                     // Small delay before retry
                     Thread.sleep(50);
@@ -143,7 +144,7 @@ public class ParkingManagementService {
             }
         }
         
-        throw new IllegalStateException("Unable to allocate slot after maximum retries");
+        throw new SlotAllocationException("Unable to allocate slot after maximum retries");
     }
     
     /**
