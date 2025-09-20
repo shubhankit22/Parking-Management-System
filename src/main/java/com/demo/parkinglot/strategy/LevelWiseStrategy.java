@@ -28,7 +28,7 @@ public class LevelWiseStrategy implements SlotAllocationStrategy {
                 })
                 .toList();
         
-        return sortedSlots.getFirst();
+        return sortedSlots.get(0);
     }
     
     @Override

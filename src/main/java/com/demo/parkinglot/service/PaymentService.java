@@ -98,6 +98,9 @@ public class PaymentService {
                 // This should not happen, but if it does, we have a serious issue
                 throw new IllegalStateException("Failed to free parking slot after successful payment");
             }
+            
+            // Refresh the slot entity to reflect the database changes
+            slot.setAvailable(true);
 
             return new ExitResponse(payment, receipt, ParkingConstants.VEHICLE_EXIT_SUCCESS);
             

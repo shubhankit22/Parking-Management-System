@@ -10,7 +10,7 @@ public class ParkingConstants {
     
     // Time calculation
     public static final int MINUTES_PER_HOUR = 60;
-    public static final int ROUNDING_OFFSET = 59; // For rounding up to next hour
+    public static final int ROUNDING_OFFSET = 60; // For rounding up to next hour
     
     // Error messages
     public static final String VEHICLE_ALREADY_PARKED = "Vehicle already parked";

@@ -116,6 +116,8 @@ public class ParkingManagementService {
                 if (updatedRows == 1) {
                     // Successfully allocated, update floor availability
                     updateFloorAvailability(nearestSlot.getFloor(), -1);
+                    // Refresh the slot to get updated availability status
+                    nearestSlot.setAvailable(false);
                     return nearestSlot;
                 } else {
                     // Slot was already allocated by another transaction

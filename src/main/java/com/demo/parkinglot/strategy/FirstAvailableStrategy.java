@@ -15,7 +15,7 @@ public class FirstAvailableStrategy implements SlotAllocationStrategy {
         if (availableSlots == null || availableSlots.isEmpty()) {
             throw new IllegalArgumentException("No available slots");
         }
-        return availableSlots.getFirst();
+        return availableSlots.get(0);
     }
     
     @Override

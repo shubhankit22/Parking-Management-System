@@ -126,7 +126,6 @@ class SlotAllocationManagerTest {
     void testAllocateOptimalSlot_WithUnavailableSlots_ThrowsException() {
         // Given
         nearestSlot.setAvailable(false);
-        when(slotAllocationService.allocateSlot(any(), any())).thenReturn(nearestSlot);
 
         // When & Then
         IllegalArgumentException exception = assertThrows(

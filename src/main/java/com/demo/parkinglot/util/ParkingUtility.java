@@ -33,7 +33,7 @@ public class ParkingUtility {
                     double distance2 = calculateDistance(entryGate, slot2);
                     return Double.compare(distance1, distance2);
                 })
-                .orElse(slots.getFirst());
+                .orElse(slots.get(0));
     }
     
     /**

@@ -1,8 +1,8 @@
 package com.demo.parkinglot.integration;
 
 import com.demo.parkinglot.entity.*;
-import com.demo.parkinglot.enums.AllocationStrategyType;
 import com.demo.parkinglot.enums.VehicleType;
+import com.demo.parkinglot.exception.SlotAllocationException;
 import com.demo.parkinglot.repository.*;
 import com.demo.parkinglot.service.ParkingManagementService;
 import com.demo.parkinglot.service.PaymentService;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,18 +42,13 @@ class ParkingFlowIntegrationTest {
     private EntryGateRepository entryGateRepository;
 
     @Autowired
-    private VehicleRepository vehicleRepository;
-
-    @Autowired
     private TicketRepository ticketRepository;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     private ParkingLot parkingLot;
     private EntryGate entryGate;
     private List<ParkingSlot> carSlots;
     private List<ParkingSlot> bikeSlots;
+
 
     @BeforeEach
     void setUp() {
@@ -68,7 +62,7 @@ class ParkingFlowIntegrationTest {
 
         // Create entry gate
         entryGate = new EntryGate();
-        entryGate.setName("Main Gate");
+        entryGate.setGateName("Main Gate");
         entryGate.setXCoordinate(0.0);
         entryGate.setYCoordinate(0.0);
         entryGate.setParkingLot(parkingLot);
@@ -86,6 +80,7 @@ class ParkingFlowIntegrationTest {
             createSlot("B-001", VehicleType.BIKE, 1, 5.0, 5.0),
             createSlot("B-002", VehicleType.BIKE, 1, 25.0, 25.0)
         );
+
     }
 
     @Test
@@ -112,15 +107,15 @@ class ParkingFlowIntegrationTest {
         ParkingSlot occupiedSlot = parkingSlotRepository.findById(ticket.getSlot().getId()).orElseThrow();
         assertFalse(occupiedSlot.isAvailable());
 
-        // When - Exit with payment
-        double paymentAmount = 4.0; // 2 hours * $2/hour
+        // When - Exit with payment (immediate exit = 1 hour minimum billing)
+        double paymentAmount = 2.0; // 1 hour * $2/hour (minimum billing)
         var exitResponse = paymentService.processPayment(ticket.getId(), paymentAmount);
 
         // Then - Exit validation
         assertNotNull(exitResponse);
         assertNotNull(exitResponse.getPayment());
         assertNotNull(exitResponse.getReceipt());
-        assertEquals("Vehicle exit successful", exitResponse.getMessage());
+        assertEquals("Vehicle successfully exited. Payment processed and slot freed.", exitResponse.getMessage());
 
         // Verify slot is freed
         ParkingSlot freedSlot = parkingSlotRepository.findById(ticket.getSlot().getId()).orElseThrow();
@@ -147,8 +142,8 @@ class ParkingFlowIntegrationTest {
         assertEquals(VehicleType.BIKE, ticket.getVehicle().getType());
         assertEquals(VehicleType.BIKE, ticket.getSlot().getSlotType());
 
-        // When - Exit with payment
-        double paymentAmount = 2.0; // 2 hours * $1/hour
+        // When - Exit with payment (immediate exit = 1 hour minimum billing)
+        double paymentAmount = 1.0; // 1 hour * $1/hour (minimum billing)
         var exitResponse = paymentService.processPayment(ticket.getId(), paymentAmount);
 
         // Then - Exit validation
@@ -168,9 +163,7 @@ class ParkingFlowIntegrationTest {
         assertNotNull(firstTicket);
 
         // When & Then - Duplicate entry should fail
-        assertThrows(IllegalStateException.class, () -> {
-            parkingManagementService.parkVehicle(plateNo, vehicleType, ownerId, entryGate.getId());
-        });
+        assertThrows(SlotAllocationException.class, () -> parkingManagementService.parkVehicle(plateNo, vehicleType, ownerId, entryGate.getId()));
     }
 
     @Test
@@ -188,10 +181,8 @@ class ParkingFlowIntegrationTest {
         assertFalse(slot.isAvailable());
 
         // When - Payment with wrong amount (should fail)
-        double wrongAmount = 1.0; // Too low
-        assertThrows(IllegalArgumentException.class, () -> {
-            paymentService.processPayment(ticket.getId(), wrongAmount);
-        });
+        double wrongAmount = 0.5; // Too low (expected is 2.0 for 1 hour)
+        assertThrows(IllegalArgumentException.class, () -> paymentService.processPayment(ticket.getId(), wrongAmount));
 
         // Then - Slot should still be occupied
         ParkingSlot stillOccupiedSlot = parkingSlotRepository.findById(slotId).orElseThrow();
@@ -231,9 +222,8 @@ class ParkingFlowIntegrationTest {
         }
 
         // When & Then - Attempt to park another car should fail
-        assertThrows(IllegalStateException.class, () -> {
-            parkingManagementService.parkVehicle("FULL-999", "CAR", "user999", entryGate.getId());
-        });
+        assertThrows(SlotAllocationException.class, () ->
+                parkingManagementService.parkVehicle("FULL-999", "CAR", "user999", entryGate.getId()));
     }
 
     private ParkingSlot createSlot(String slotNumber, VehicleType slotType, int floor, double x, double y) {
