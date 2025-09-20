@@ -17,10 +17,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll() // Open docs and H2
-                        .requestMatchers("/api/health/**", "/api/info/**").permitAll() // Health and info endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Admin only endpoints
-                        .requestMatchers("/api/entry", "/api/exit/**", "/api/entry-gates", "/api/parking-lot/**/status").authenticated() // Public parking operations
+                        .requestMatchers("/swagger-ui/*", "/v3/api-docs/*", "/h2-console/*").permitAll() // Open docs and H2
+                        .requestMatchers("/api/health/*", "/api/info/*").permitAll() // Health and info endpoints
+                        .requestMatchers("/api/admin/*").hasRole("ADMIN") // Admin only endpoints
+                        .requestMatchers("/api/entry", "/api/exit/*", "/api/entry-gates", "/api/parking-lot/*/status").authenticated() // Public parking operations
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint()
