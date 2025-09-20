@@ -1,5 +1,6 @@
 package com.demo.parkinglot.entity;
 
+import com.demo.parkinglot.constants.ParkingConstants;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -32,6 +33,10 @@ public class Receipt {
         this.durationInMinutes = durationInMinutes;
         this.generatedAt = LocalDateTime.now();
         this.receiptNumber = receiptNumber;
+    }
+    
+    public Receipt(Ticket ticket, double totalAmount, double hourlyRate, long durationInMinutes) {
+        this(ticket, totalAmount, hourlyRate, durationInMinutes, ParkingConstants.RECEIPT_PREFIX + "-" + System.currentTimeMillis());
     }
     
     // Getters and Setters

@@ -28,13 +28,6 @@ public class ParkingController {
     @Autowired
     private EntryGateRepository entryGateRepository;
 
-    @GetMapping("/info")
-    public Map<String, String> getApplicationInfo() {
-        return Map.of(
-                "name", appName
-        );
-    }
-
     @PostMapping("/entry")
     public ResponseEntity<Ticket> parkVehicle(@RequestBody ParkingRequest request) {
         Ticket ticket = parkingService.parkVehicle(request.getPlateNo(), request.getVehicleType(), request.getOwnerId(), request.getEntryGateId());
@@ -51,5 +44,17 @@ public class ParkingController {
     public ResponseEntity<List<EntryGate>> getEntryGates() {
         List<EntryGate> gates = entryGateRepository.findAll();
         return ResponseEntity.ok(gates);
+    }
+    
+    @GetMapping("/parking-lot/{parkingLotId}/status")
+    public ResponseEntity<Map<String, Object>> getParkingLotStatus(@PathVariable Long parkingLotId) {
+        Map<String, Object> status = parkingService.getParkingLotStatus(parkingLotId);
+        return ResponseEntity.ok(status);
+    }
+    
+    @PostMapping("/exit/{ticketId}/retry")
+    public ResponseEntity<ExitResponse> retryPayment(@PathVariable Long ticketId, @RequestBody PaymentRequest paymentRequest) {
+        ExitResponse response = parkingService.retryPayment(ticketId, paymentRequest.getAmount());
+        return ResponseEntity.ok(response);
     }
 }

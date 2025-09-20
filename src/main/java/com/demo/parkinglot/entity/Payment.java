@@ -1,9 +1,12 @@
 package com.demo.parkinglot.entity;
 
+import com.demo.parkinglot.enums.PaymentStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,16 +23,26 @@ public class Payment {
 
     private LocalDateTime paidAt;
 
-    private String status; // PAID, FAILED
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+    
+    private String failureReason;
 
     // Constructors, Getters, Setters
     public Payment() {}
 
-    public Payment(Ticket ticket, double amount, LocalDateTime paidAt, String status) {
+    public Payment(Ticket ticket, double amount, LocalDateTime paidAt, PaymentStatus status) {
         this.ticket = ticket;
         this.amount = amount;
         this.paidAt = paidAt;
         this.status = status;
+    }
+    
+    public Payment(Ticket ticket, double amount, LocalDateTime paidAt, String statusString) {
+        this.ticket = ticket;
+        this.amount = amount;
+        this.paidAt = paidAt;
+        this.status = PaymentStatus.fromString(statusString);
     }
 
     public Long getId() { return id; }
@@ -44,6 +57,13 @@ public class Payment {
     public LocalDateTime getPaidAt() { return paidAt; }
     public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public PaymentStatus getStatus() { return status; }
+    public void setStatus(PaymentStatus status) { this.status = status; }
+    
+    public void setStatus(String statusString) { 
+        this.status = PaymentStatus.fromString(statusString); 
+    }
+    
+    public String getFailureReason() { return failureReason; }
+    public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
 }
